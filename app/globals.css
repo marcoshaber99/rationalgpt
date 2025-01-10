@@ -55,10 +55,10 @@ body {
 
   .dark {
     /* Dark theme: Deep evergreen backgrounds with warm accents */
-    --background: 160 25% 12%;
+    --background: 160 25% 9%;
     --foreground: 35 25% 90%;
 
-    --card: 160 25% 12%;
+    --card: 160 25% 10%;
     --card-foreground: 35 25% 90%;
 
     --popover: 160 25% 12%;
