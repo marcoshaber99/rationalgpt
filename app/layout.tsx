@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Azeret_Mono as Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { Toaster } from "@/components/ui/toaster";
+
 const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
@@ -26,6 +28,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

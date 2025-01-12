@@ -1,22 +1,52 @@
 import { openai } from "@ai-sdk/openai";
 import { streamText } from "ai";
+import { ratelimit } from "@/lib/rate-limit";
+import { headers } from "next/headers";
 
-// Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
-  // Extract messages array from request body
-  const { messages } = await req.json();
+  try {
+    const ip = (await headers()).get("x-forwarded-for") ?? "127.0.0.1";
+    const { success } = await ratelimit.limit(ip);
 
-  // Use Vercel AI SDK to stream GPT-4 responses
-  // - Handles token streaming
-  // - Manages response formatting
-  // - Automatically sets proper headers
-  const result = streamText({
-    model: openai("gpt-4o"),
-    messages,
-  });
+    if (!success) {
+      return new Response(
+        JSON.stringify({
+          error: "Too many requests. Please wait a moment before trying again.",
+        }),
+        {
+          status: 429,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+          },
+        }
+      );
+    }
 
-  // Convert the stream to a Response object with appropriate headers
-  return result.toDataStreamResponse();
+    const { messages } = await req.json();
+
+    const result = streamText({
+      model: openai("gpt-4o"),
+      messages,
+    });
+
+    return result.toDataStreamResponse();
+  } catch (error) {
+    console.error("Chat API error:", error);
+    return new Response(
+      JSON.stringify({
+        error: "An unexpected error occurred. Please try again later.",
+      }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  }
 }
