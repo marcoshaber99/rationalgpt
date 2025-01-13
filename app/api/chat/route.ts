@@ -30,6 +30,8 @@ export async function POST(req: Request) {
     const { messages } = await req.json();
 
     const result = streamText({
+      system:
+        "You are a helpful assistant. Format your responses using Markdown to improve readability. Use headers, lists, bold, italics, and code blocks where appropriate.",
       model: openai("gpt-4o"),
       messages,
     });

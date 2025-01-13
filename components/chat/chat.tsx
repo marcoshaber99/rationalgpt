@@ -11,6 +11,7 @@ export default function Chat() {
   const { toast } = useToast();
 
   const { messages, input, handleInputChange, handleSubmit } = useChat({
+    experimental_throttle: 50,
     onError: (error) => {
       console.error("Chat error:", error);
       if (error.message.includes("Too many requests")) {
